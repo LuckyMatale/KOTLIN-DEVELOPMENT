@@ -13,24 +13,37 @@ enum class FormType {
 // Class representing the role of the user submitting the form
 class UserRole(var position: String = "REPRESENTATIVE") {
     fun getUserRole() {
-        print("Who is submitting the form? (Representative/Manager): ")
-        position = readln().trim().uppercase() ?: "REPRESENTATIVE"
+        while (true) { // Loop until a valid input is entered
+            print("Who is submitting the form? (Representative/Manager): ")
+            val input = readln().trim().uppercase()
+            if (input == "REPRESENTATIVE" || input == "MANAGER") {
+                position = input
+                break
+            } else {
+                println("Invalid input. Please enter 'Representative' or 'Manager'.")
+            }
+        }
     }
 }
 
 // Class handling form operations and details
-class Form(private val formType: FormType, private var formStatus: String, private var content: String) {
+class Form(private var formStatus: String, private var content: String) {
 
     private lateinit var submissionDate: String
 
-    fun getStatus(userRole: UserRole) {
-        print("Is the form complete? (complete/incomplete): ")
-        formStatus = readln().trim().lowercase()
-
+    private fun getStatus(userRole: UserRole) {
+       while(true){
+           print("Is the form complete? (complete/incomplete): ")
+           formStatus = readln().trim().lowercase()
+           if(formStatus == "complete" || formStatus == "incomplete"){
+               break
+           }else{
+               println("Invalid form status. Please enter 'complete' or 'incomplete'.")
+           }
+       }
         when (formStatus) {
             "incomplete" -> handleIncompleteForm()
             "complete" -> handleCompleteForm(userRole)
-            else -> println("Invalid form status. Please enter 'complete' or 'incomplete'.")
         }
     }
 
@@ -55,12 +68,13 @@ class Form(private val formType: FormType, private var formStatus: String, priva
         userRole.getUserRole()
 
         println("Select Form Type:")
-        FormType.values().forEachIndexed { index, formType -> println("${index + 1}. $formType") }
+        FormType.entries.forEachIndexed { index, formType -> println("${index + 1}. $formType") }
         val formTypeIndex = readlnOrNull()?.toIntOrNull()?.minus(1) ?: 0
-        val selectedFormType = FormType.values().getOrNull(formTypeIndex) ?: FormType.EMPLOYEE_FORM
+        val selectedFormType = FormType.entries.getOrNull(formTypeIndex) ?: FormType.EMPLOYEE_FORM
 
         print("Enter form content: ")
         content = readlnOrNull() ?: ""
+
 
         submissionDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
 
@@ -101,7 +115,7 @@ fun displayMenu() {
         menu.forEach { (key, value) -> println("$key. $value") }
 
         when (readlnOrNull()?.toIntOrNull()) {
-            1 -> Form(FormType.EMPLOYEE_FORM, "", "").submitForm()
+            1 -> Form("", "").submitForm()
             2 -> Report.displayReport()
             3 -> searchForm()
             4 -> {
